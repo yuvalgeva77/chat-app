@@ -15,14 +15,13 @@ _histories: Dict[str, List[Dict[str, str]]] = {}
 
 
 def init_model() -> None:
-    """Initialize the model optimized for small models."""
+    """Initialize the model."""
     global model, tokenizer, pipe
-
-    logger.info(f"Loading small model: {MODEL_NAME}")
+    logger.info(f"Loading chat model: {MODEL_NAME}...")
 
     try:
         # Load tokenizer first
-        logger.info("Loading tokenizer...")
+        logger.debug("Loading tokenizer...")
         tokenizer = AutoTokenizer.from_pretrained(
             MODEL_NAME,
             trust_remote_code=True
@@ -32,27 +31,24 @@ def init_model() -> None:
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
 
-        # Load model with minimal configuration
-        logger.info("Loading model...")
         model = AutoModelForCausalLM.from_pretrained(
             MODEL_NAME,
             trust_remote_code=True
         )
 
-        # Move to GPU if available (optional)
+        # Move to GPU if available
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        logger.info(f"Using device: {device}")
+        logger.debug(f"Using device: {device}")
 
         if torch.cuda.is_available():
             try:
                 model = model.to(device)
-                logger.info("Model moved to GPU")
+                logger.debug("Model moved to GPU")
             except Exception as e:
                 logger.warning(f"Could not move to GPU, using CPU: {e}")
                 device = "cpu"
 
         # Create pipeline
-        logger.info("Creating pipeline...")
         pipe = pipeline(
             "text-generation",
             model=model,
@@ -184,7 +180,7 @@ def _format_prompt(history: List[Dict[str, str]], user_message: str) -> str:
 
 
 def _generate_response(prompt: str) -> str:
-    """Generate response optimized for small models."""
+    """Generate response."""
     try:
         # Calculate input length
         input_tokens = tokenizer.encode(prompt, return_tensors="pt")
