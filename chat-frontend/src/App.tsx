@@ -28,7 +28,7 @@ interface HistoryResponse {
  * API Service class for handling communication with the FastAPI backend
  */
 class ChatAPI {
-  private baseUrl = 'http://localhost:8000'; // Make sure your FastAPI backend is running on this port
+  private baseUrl = 'http://localhost:8002'; // FastAPI backend port
 
   /**
    * Send a message to the chat API
