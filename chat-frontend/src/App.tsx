@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Trash2, MessageCircle, Bot, User, Loader2 } from 'lucide-react';
 
-// Types
+/**
+ * Type definitions for the chat application
+ */
 interface Message {
   id: string;
   text: string;
@@ -22,10 +24,18 @@ interface HistoryResponse {
   }>;
 }
 
-// API Service
+/**
+ * API Service class for handling communication with the FastAPI backend
+ */
 class ChatAPI {
-  private baseUrl = 'http://localhost:8000'; // Adjust to your backend URL
+  private baseUrl = 'http://localhost:8000'; // Make sure your FastAPI backend is running on this port
 
+  /**
+   * Send a message to the chat API
+   * @param message - The user's message
+   * @param sessionId - Optional session ID for conversation continuity
+   * @returns Promise with the bot's response and session ID
+   */
   async sendMessage(message: string, sessionId?: string): Promise<ChatResponse> {
     const response = await fetch(`${this.baseUrl}/chat`, {
       method: 'POST',
@@ -39,22 +49,31 @@ class ChatAPI {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to send message');
+      throw new Error(`HTTP ${response.status}: Failed to send message`);
     }
 
     return response.json();
   }
 
+  /**
+   * Retrieve conversation history for a session
+   * @param sessionId - The session ID to get history for
+   * @returns Promise with conversation history
+   */
   async getHistory(sessionId: string): Promise<HistoryResponse> {
     const response = await fetch(`${this.baseUrl}/history?session_id=${sessionId}`);
 
     if (!response.ok) {
-      throw new Error('Failed to get history');
+      throw new Error(`HTTP ${response.status}: Failed to get history`);
     }
 
     return response.json();
   }
 
+  /**
+   * Reset conversation history for a session or all sessions
+   * @param sessionId - Optional session ID to reset. If not provided, resets all sessions
+   */
   async resetHistory(sessionId?: string): Promise<void> {
     const url = sessionId
       ? `${this.baseUrl}/history/reset?session_id=${sessionId}`
@@ -65,12 +84,14 @@ class ChatAPI {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to reset history');
+      throw new Error(`HTTP ${response.status}: Failed to reset history`);
     }
   }
 }
 
-// Components
+/**
+ * Loading spinner component displayed when AI is processing
+ */
 const LoadingSpinner: React.FC = () => (
   <div className="flex items-center space-x-2 text-blue-500">
     <Loader2 className="w-4 h-4 animate-spin" />
@@ -78,6 +99,10 @@ const LoadingSpinner: React.FC = () => (
   </div>
 );
 
+/**
+ * Individual chat message component
+ * @param message - Message object containing text, sender, and timestamp
+ */
 const ChatMessage: React.FC<{ message: Message }> = ({ message }) => {
   const isUser = message.sender === 'user';
 
@@ -100,6 +125,11 @@ const ChatMessage: React.FC<{ message: Message }> = ({ message }) => {
   );
 };
 
+/**
+ * Chat input component for sending messages
+ * @param onSendMessage - Callback function when user sends a message
+ * @param disabled - Whether the input should be disabled (e.g., during loading)
+ */
 const ChatInput: React.FC<{
   onSendMessage: (message: string) => void;
   disabled: boolean;
