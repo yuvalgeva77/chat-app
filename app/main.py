@@ -3,10 +3,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from .api.services.chat_engine import *
 from .api.routers.chat import router as chat_router
-from .core.logging_config import setup_logging
+from .core.logging_config import *
 
-setup_logging()
-logger = logging.getLogger()
+logger = get_logger()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
