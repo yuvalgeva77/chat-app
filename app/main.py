@@ -1,21 +1,57 @@
 # app/main.py
-from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from .api.services.chat_engine import *
+from fastapi.middleware.cors import CORSMiddleware
 from .api.routers.chat import router as chat_router
-from .core.logging_config import *
+from .core.logging_config import get_logger
+from .api.services.chat_engine import init_model
 
-logger = get_logger()
+# Initialize logger
+logger = get_logger("main")
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    logger.info("Starting up…")
-    init_model()
+# Create FastAPI app
+app = FastAPI(
+    title="Chat API",
+    description="A simple chat API using Hugging Face models",
+    version="1.0.0"
+)
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, replace with specific origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include routers
+app.include_router(chat_router, prefix="/api", tags=["chat"])
+
+# Startup event
+@app.on_event("startup")
+async def startup_event():
+    """Initialize the model when the application starts."""
+    logger.info("Starting up application...")
     try:
-        yield
-    finally:
-        logger.info("Shutting down…")
-        shutdown_model()
+        init_model()
+        logger.info("Application startup complete")
+    except Exception as e:
+        logger.error(f"Error during startup: {str(e)}")
+        raise
 
-app = FastAPI(title="chat-app", version="0.1", lifespan=lifespan)
-app.include_router(chat_router, prefix="/api")
+# Root endpoint
+@app.get("/")
+async def root():
+    """Root endpoint that provides basic API information."""
+    return {
+        "name": "Chat API",
+        "version": "1.0.0",
+        "description": "A simple chat API using Hugging Face models",
+        "documentation": "/docs"
+    }
+
+# Health check endpoint
+@app.get("/health")
+async def health():
+    """Health check endpoint."""
+    return {"status": "ok"}
