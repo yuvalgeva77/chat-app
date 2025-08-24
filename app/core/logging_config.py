@@ -9,7 +9,7 @@ def get_logger(name: str = "chat-app") -> logging.Logger:
     if logger.handlers:   # already configured
         return logger
 
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
     fmt = logging.Formatter(
         "%(asctime)s [%(levelname)s] %(name)s:%(filename)s:%(lineno)d - %(message)s",

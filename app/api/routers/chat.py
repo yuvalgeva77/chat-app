@@ -11,6 +11,7 @@ logger = get_logger("chat-router")
 @router.get("/health")
 async def health_check():
     """Health check endpoint."""
+    logger.debug("Health check api called")
     return {"status": "ok", "message": "Chat service is running"}
 
 @router.post("/chat", response_model=ChatResponse)
@@ -25,6 +26,7 @@ async def chat_endpoint(request: Request, chat_request: ChatRequest):
     Returns:
         ChatResponse containing the AI's reply and session ID
     """
+    logger.debug("Chat endpoint called")
     try:
         # Use provided session ID or generate a new one
         session_id = chat_request.session_id or str(uuid4())
@@ -35,12 +37,12 @@ async def chat_endpoint(request: Request, chat_request: ChatRequest):
         
         # Get response from chat engine
         reply = chat_once(session_id, chat_request.message)
-        
+        logger.debug(f"Chat response: {reply}")
+
         return ChatResponse(
             reply=reply,
             session_id=session_id
         )
-        
     except Exception as e:
         logger.error(f"Error in chat endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -59,6 +61,7 @@ async def get_chat_history(
         HistoryResponse containing the conversation history
     """
     try:
+        logger.debug(f"Get history for session {session_id}")
         history = get_history(session_id)
         return HistoryResponse(
             session_id=session_id,
@@ -85,6 +88,7 @@ async def reset_chat_history(
         dict: Status message and count of sessions reset
     """
     try:
+        logger.debug(f"Reset history for session {session_id}")
         count = reset_history(session_id)
         if session_id:
             message = f"Reset history for session {session_id}"
