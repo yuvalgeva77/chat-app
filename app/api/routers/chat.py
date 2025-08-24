@@ -60,22 +60,39 @@ async def chat_stream_endpoint(
     sid = session_id or str(uuid4())
     logger.info(f"SSE stream start | Session: {sid}")
 
-    def event_generator():
+    async def event_generator():
         try:
             for chunk in chat_stream(sid, message):
                 yield f"data: {json.dumps({'token': chunk, 'session_id': sid})}\n\n"
+                # Add a small delay to prevent overwhelming the client
+                import asyncio
+                await asyncio.sleep(0.01)
+                
+            # Send final done message
             yield f"data: {json.dumps({'done': True, 'session_id': sid})}\n\n"
         except Exception as e:
-            logger.error(f"SSE error: {e}")
-            # send an error event (optional)
-            yield f"event: error\ndata: {json.dumps({'error': str(e), 'session_id': sid})}\n\n"
+            logger.error(f"SSE error in generator: {e}", exc_info=True)
+            # Send error as a proper SSE event
+            error_data = json.dumps({
+                'error': str(e),
+                'session_id': sid
+            })
+            yield f"event: error\ndata: {error_data}\n\n"
+        finally:
+            logger.info(f"SSE stream ended | Session: {sid}")
 
     headers = {
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
-        "X-Accel-Buffering": "no",
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'X-Accel-Buffering': 'no',
     }
-    return StreamingResponse(event_generator(), media_type="text/event-stream", headers=headers)
+    
+    return StreamingResponse(
+        event_generator(),
+        media_type='text/event-stream',
+        headers=headers
+    )
 
 @router.get("/history", response_model=HistoryResponse)
 async def get_chat_history(

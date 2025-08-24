@@ -70,17 +70,17 @@ class ChatAPI {
     onComplete: (sessionId: string) => void,
     onError: (error: string) => void
   ): Promise<void> {
-    const params = new URLSearchParams({
-      message,
-      ...(sessionId && { session_id: sessionId }),
-    });
+    const params = new URLSearchParams({ message });
+    if (sessionId) {
+      params.append('session_id', sessionId);
+    }
 
-    const eventSource = new EventSource(`${this.baseUrl}/chat/stream?${params}`);
+    const eventSource = new EventSource(`${this.baseUrl}/chat/stream?${params.toString()}`);
 
+    // Handle successful messages
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-
         if (data.done) {
           eventSource.close();
           onComplete(data.session_id);
@@ -94,6 +94,7 @@ class ChatAPI {
       }
     };
 
+    // Handle errors
     eventSource.onerror = (event) => {
       console.error('SSE error:', event);
       eventSource.close();
@@ -101,9 +102,9 @@ class ChatAPI {
     };
 
     // Handle custom error events from backend
-    eventSource.addEventListener('error', (event) => {
+    eventSource.addEventListener('error', (event: MessageEvent) => {
       try {
-        const data = JSON.parse((event as any).data);
+        const data = JSON.parse(event.data);
         if (data.error) {
           eventSource.close();
           onError(data.error);
@@ -112,6 +113,11 @@ class ChatAPI {
         eventSource.close();
         onError('Unknown streaming error');
       }
+    });
+
+    // Return a promise that resolves when the stream is closed
+    return new Promise((resolve) => {
+      Object.assign(eventSource, { oncomplete: resolve });
     });
   }
 
