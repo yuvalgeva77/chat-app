@@ -218,7 +218,7 @@ const ChatInput: React.FC<{
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Type your message..."
+          placeholder="Ask about experience, projects, availability..."
           disabled={disabled}
           className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
         />
@@ -364,28 +364,41 @@ const ChatApp: React.FC = () => {
     <div className="h-screen bg-gray-100 flex flex-col">
       <div className="flex-1 bg-white shadow-lg flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <MessageCircle className="w-6 h-6" />
               <div>
-                <h1 className="text-xl font-bold">AI Chat Assistant</h1>
+                <h1 className="text-xl font-bold">Youval's Resume Assistant</h1>
                 <p className="text-sm opacity-80">
                   {sessionId ? `Session: ${sessionId}` : 'New Session'}
                 </p>
               </div>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex items-center space-x-2">
+              <a
+                href="/Youval_Geva_Resume.pdf"
+                download="Youval_Geva_Resume.pdf"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm transition-colors flex items-center space-x-1.5 shadow-sm"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Download CV</span>
+              </a>
               <button
                 onClick={startNewSession}
-                className="bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded text-sm transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm transition-colors flex items-center space-x-1.5 shadow-sm"
               >
-                New Chat
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                <span>New Chat</span>
               </button>
               {messages.length > 0 && (
                 <button
                   onClick={clearHistory}
-                  className="bg-red-500 bg-opacity-80 hover:bg-opacity-100 px-3 py-1 rounded text-sm transition-colors flex items-center space-x-1"
+                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-sm transition-colors flex items-center space-x-1.5 shadow-sm"
                 >
                   <Trash2 className="w-4 h-4" />
                   <span>Clear</span>
@@ -406,10 +419,32 @@ const ChatApp: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
           {messages.length === 0 ? (
             <div className="flex items-center justify-center h-full text-gray-500">
-              <div className="text-center">
-                <Bot className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p className="text-lg mb-2">Welcome to AI Chat!</p>
-                <p className="text-sm">Send a message to start the conversation.</p>
+              <div className="text-center max-w-md w-full">
+                <Bot className="w-12 h-12 mx-auto mb-4 text-blue-500" />
+                <p className="text-lg mb-2 font-medium">Hi, I'm Youval's résumé assistant. What would you like to know?</p>
+                <p className="text-sm text-gray-600 mb-6">Click on any option below or type your question.</p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto">
+                  {['Summary', 'Experience', 'Projects', 'Availability', 'Work Authorization', 'Location', 'Contact'].map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => sendMessage(option)}
+                      className="px-4 py-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-blue-50 hover:border-blue-200 transition-colors text-sm font-medium text-gray-700"
+                    >
+                      {option}
+                    </button>
+                  ))}
+                  <a
+                    href="/Youval_Geva_Resume.pdf"
+                    download="Youval_Geva_Resume.pdf"
+                    className="px-4 py-3 bg-blue-500 text-white rounded-lg shadow-sm hover:bg-blue-600 transition-colors text-sm font-medium flex items-center justify-center space-x-2"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Download CV</span>
+                  </a>
+                </div>
               </div>
             </div>
           ) : (
