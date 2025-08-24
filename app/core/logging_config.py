@@ -22,7 +22,7 @@ def get_logger(name: str = "chat-app") -> logging.Logger:
 
     # Reduce noisy third‑party loggers
     for n in ("uvicorn", "uvicorn.error", "uvicorn.access", "httpx", "urllib3"):
-        logging.getLogger(n).setLevel(logging.WARNING)
+        logging.getLogger(n).setLevel(logging.INFO)
 
     # Don’t let child loggers duplicate to root
     logger.propagate = False
