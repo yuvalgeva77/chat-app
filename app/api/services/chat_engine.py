@@ -233,15 +233,15 @@ def chat_once(session_id: str, user_message: str) -> str:
             _histories[session_id] = []
 
         logger.info(f"Processing message for session {session_id}")
+        # Update conversation history for user
+        _histories[session_id].append({"role": "user", "content": user_message})
 
         # Format prompt
         prompt = _format_prompt(_histories[session_id], user_message)
-
         # Generate response
         reply = _generate_response(prompt)
 
-        # Update conversation history
-        _histories[session_id].append({"role": "user", "content": user_message})
+        # Update conversation history with response
         _histories[session_id].append({"role": "assistant", "content": reply})
 
         # Trim history to prevent memory bloat
