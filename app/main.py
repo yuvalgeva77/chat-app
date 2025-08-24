@@ -18,14 +18,14 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(chat_router, prefix="/api", tags=["chat"])
+# Include the chat router
+app.include_router(chat_router, prefix="")
 
 # Startup event
 @app.on_event("startup")
@@ -44,7 +44,7 @@ async def startup_event():
 async def root():
     """Root endpoint that provides basic API information."""
     return {
-        "name": "Chat API",
+        "name": "Chat API is running",
         "version": "1.0.0",
         "description": "A simple chat API using Hugging Face models",
         "documentation": "/docs"
