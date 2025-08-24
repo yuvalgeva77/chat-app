@@ -300,27 +300,37 @@ def _extractive_answer(user_message: str, retrieved_snippets: List[Tuple[str, st
 
 # ===================== Generation =====================
 def _generate(prompt: str) -> str:
-    enc, input_len, max_new, min_new, max_length = _budget_and_tokenize(prompt)
-    gen_kwargs = dict(
-        enc,
-        max_new_tokens=max_new,
-        min_new_tokens=min_new,
-        max_length=max_length,
-        repetition_penalty=REPETITION_PENALTY,
-        no_repeat_ngram_size=NO_REPEAT_NGRAM_SIZE,
-        pad_token_id=tokenizer.eos_token_id,
-        eos_token_id=tokenizer.eos_token_id,
-        use_cache=True,
-        num_return_sequences=1,
-    )
-    if DO_SAMPLE:
-        if TEMPERATURE is not None: gen_kwargs["temperature"] = TEMPERATURE
-        if TOP_K: gen_kwargs["top_k"] = TOP_K
-        if TOP_P is not None: gen_kwargs["top_p"] = TOP_P
-    with torch.inference_mode():
-        outputs = model.generate(gen_kwargs)
-    new_tokens = outputs[0][input_len:]
-    return _clean_response(tokenizer.decode(new_tokens, skip_special_tokens=True))
+    try:
+        enc, input_len, max_new, min_new, max_length = _budget_and_tokenize(prompt)
+        gen_kwargs = {
+            **enc,  # Unpack the encoded inputs
+            "max_new_tokens": max_new,
+            "min_new_tokens": min_new,
+            "max_length": max_length,
+            "repetition_penalty": REPETITION_PENALTY,
+            "no_repeat_ngram_size": NO_REPEAT_NGRAM_SIZE,
+            "pad_token_id": tokenizer.eos_token_id,
+            "eos_token_id": tokenizer.eos_token_id,
+            "use_cache": True,
+            "num_return_sequences": 1,
+        }
+        if DO_SAMPLE:
+            if TEMPERATURE is not None:
+                gen_kwargs["temperature"] = TEMPERATURE
+            if TOP_K:
+                gen_kwargs["top_k"] = TOP_K
+            if TOP_P is not None:
+                gen_kwargs["top_p"] = TOP_P
+
+        with torch.inference_mode():
+            outputs = model.generate(**gen_kwargs)  # Unpack the kwargs properly
+
+        new_tokens = outputs[0][input_len:]
+        return _clean_response(tokenizer.decode(new_tokens, skip_special_tokens=True))
+
+    except Exception as e:
+        logger.error(f"Generation failed: {e}")
+        return "I encountered an error while generating a response. Please try again."
 
 
 # ===================== Public API (non-streaming) =====================
@@ -431,7 +441,6 @@ def chat_stream(
         if intent in ["contact", "summary", "experience", "skills", "projects",
                       "availability", "authorization", "location"]:
             import time
-            import asyncio
 
             # Add a small delay to simulate thinking (0.5-1.5 seconds)
             thinking_delay = 0.8 + (hash(user_message) % 100) / 100.0 * 0.7  # 0.8-1.5 seconds
@@ -450,59 +459,92 @@ def chat_stream(
     context_text = "\n\n".join(txt for _, txt in retrieved_snippets)
 
     prompt = _format_prompt(hist, user_message, allow_contact, retrieved_snippets)
-    enc, input_len, max_new, min_new, max_length = _budget_and_tokenize(prompt)
 
-    streamer = TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
-    gen_kwargs = dict(
-        enc,
-        max_new_tokens=max_new,
-        min_new_tokens=min_new,
-        max_length=max_length,
-        streamer=streamer,
-        repetition_penalty=REPETITION_PENALTY,
-        no_repeat_ngram_size=NO_REPEAT_NGRAM_SIZE,
-        pad_token_id=tokenizer.eos_token_id,
-        eos_token_id=tokenizer.eos_token_id,
-        use_cache=True,
-        num_return_sequences=1,
-    )
-    if DO_SAMPLE:
-        if TEMPERATURE is not None: gen_kwargs["temperature"] = TEMPERATURE
-        if TOP_K: gen_kwargs["top_k"] = TOP_K
-        if TOP_P is not None: gen_kwargs["top_p"] = TOP_P
-
-    def _run():
-        with torch.inference_mode():
-            model.generate(gen_kwargs)
-
-    thread = threading.Thread(target=_run, daemon=True)
-    thread.start()
-
-    chunks: List[str] = []
     try:
-        for piece in streamer:
-            chunks.append(piece)
-            yield piece
-    finally:
-        full = "".join(chunks).strip()
-        if not full or not _is_grounded(full, context_text + "\n" + str(get_facts())):
-            # Use smart template-based fallback
-            fallback_reply = build_smart_fallback(intent, user_message, retrieved_snippets)
-            fb = _apply_redaction(fallback_reply, allow_contact)
-            if not full:
-                yield fb
-            cleaned = fb
-            sent_fallback = 1 if not full else 2  # 2 = replaced ungrounded
-        else:
-            cleaned = _clean_response(full)
-            cleaned = _apply_redaction(cleaned, allow_contact)
-            sent_fallback = 0
+        enc, input_len, max_new, min_new, max_length = _budget_and_tokenize(prompt)
 
-        hist.append({"role": "assistant", "content": cleaned})
+        streamer = TextIteratorStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
+        gen_kwargs = {
+            **enc,  # Unpack the encoded inputs properly
+            "max_new_tokens": max_new,
+            "min_new_tokens": min_new,
+            "max_length": max_length,
+            "streamer": streamer,
+            "repetition_penalty": REPETITION_PENALTY,
+            "no_repeat_ngram_size": NO_REPEAT_NGRAM_SIZE,
+            "pad_token_id": tokenizer.eos_token_id,
+            "eos_token_id": tokenizer.eos_token_id,
+            "use_cache": True,
+            "num_return_sequences": 1,
+        }
+        if DO_SAMPLE:
+            if TEMPERATURE is not None:
+                gen_kwargs["temperature"] = TEMPERATURE
+            if TOP_K:
+                gen_kwargs["top_k"] = TOP_K
+            if TOP_P is not None:
+                gen_kwargs["top_p"] = TOP_P
+
+        def _run():
+            try:
+                with torch.inference_mode():
+                    model.generate(**gen_kwargs)  # Unpack the kwargs properly
+            except Exception as e:
+                logger.error(f"Streaming generation failed: {e}")
+                # Signal the streamer to stop
+                streamer.end()
+
+        thread = threading.Thread(target=_run, daemon=True)
+        thread.start()
+
+        chunks: List[str] = []
+        generation_failed = False
+
+        try:
+            for piece in streamer:
+                chunks.append(piece)
+                yield piece
+        except Exception as e:
+            logger.error(f"Streaming error: {e}")
+            generation_failed = True
+
+        finally:
+            full = "".join(chunks).strip()
+
+            # Handle generation failure or ungrounded responses
+            if generation_failed or not full or not _is_grounded(full, context_text + "\n" + str(get_facts())):
+                # Use smart template-based fallback
+                fallback_reply = build_smart_fallback(intent, user_message, retrieved_snippets)
+                fb = _apply_redaction(fallback_reply, allow_contact)
+
+                if generation_failed or not full:
+                    yield fb
+                    cleaned = fb
+                    sent_fallback = 1  # Used fallback due to generation failure
+                else:
+                    cleaned = fb
+                    sent_fallback = 2  # Replaced ungrounded response
+            else:
+                cleaned = _clean_response(full)
+                cleaned = _apply_redaction(cleaned, allow_contact)
+                sent_fallback = 0
+
+            hist.append({"role": "assistant", "content": cleaned})
+            if HISTORY_TRIM_ON_EACH_REPLY:
+                hist[:] = hist[-(HISTORY_MAX_TURNS * 2):]
+
+            logger.info(
+                f"[stream] done | intent={intent} | contact_allowed={allow_contact} | fallback_mode={sent_fallback}")
+
+    except Exception as e:
+        logger.error(f"Chat stream failed: {e}")
+        # Fallback to template response
+        fallback_reply = build_smart_fallback(intent, user_message, [])
+        reply = _apply_redaction(fallback_reply, allow_contact)
+        yield reply
+        hist.append({"role": "assistant", "content": reply})
         if HISTORY_TRIM_ON_EACH_REPLY:
             hist[:] = hist[-(HISTORY_MAX_TURNS * 2):]
-        logger.info(
-            f"[stream] done | intent={_detect_intent(user_message)} | contact_allowed={allow_contact} | fallback_mode={sent_fallback}")
 
 
 # ===== Utilities =====
