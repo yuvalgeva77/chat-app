@@ -1,11 +1,11 @@
-# Optimized model configuration for speed and efficiency
+# Optimized model configuration for speed, relevance, and stability
 
 # Model Selection (choose one by uncommenting):
 # For best speed/quality balance:
 MODEL_NAME: str = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 MODEL_TYPE: str = "tinyllama"
 
-# For smallest memory footprint:
+# For smallest memory footprint (CPU-friendly):
 # MODEL_NAME: str = "Qwen/Qwen2-0.5B-Instruct"
 # MODEL_TYPE: str = "qwen"
 
@@ -17,19 +17,20 @@ MODEL_TYPE: str = "tinyllama"
 # MODEL_NAME: str = "microsoft/DialoGPT-small"
 # MODEL_TYPE: str = "dialogpt"
 
-# Optimized generation parameters for speed
-MAX_NEW_TOKENS: int = 100  # Reduced for faster responses
-DO_SAMPLE: bool = True
-TEMPERATURE: float = 0.7  # Slightly lower for more focused responses
-TOP_K: int = 30  # Reduced for speed
-TOP_P: float = 0.85  # Slightly lower for speed
-REPETITION_PENALTY: float = 1.05  # Minimal to avoid over-correction
-NO_REPEAT_NGRAM_SIZE: int = 2  # Reduced for speed
+# Generation parameters (near-greedy for on-topic answers)
+MAX_NEW_TOKENS: int = 160
+DO_SAMPLE: bool = False          # Deterministic decoding by default
+TEMPERATURE: float = 0.3         # Only used if DO_SAMPLE=True
+TOP_K: int = 0                   # Only used if DO_SAMPLE=True
+TOP_P: float = 1.0               # Only used if DO_SAMPLE=True
+REPETITION_PENALTY: float = 1.05
+NO_REPEAT_NGRAM_SIZE: int = 2
 
 # Memory management
-HISTORY_MAX_TURNS: int = 4  # Keep recent context
+# HISTORY_MAX_TURNS counts "exchanges" (user+assistant pairs) used for prompt building.
+HISTORY_MAX_TURNS: int = 2       # Keep last 2 exchanges in the prompt
 HISTORY_TRIM_ON_EACH_REPLY: bool = True
 
-# Batch processing (if implementing batch endpoints later)
+# Batch (not used yet)
 MAX_BATCH_SIZE: int = 4
 BATCH_TIMEOUT: float = 0.1  # seconds

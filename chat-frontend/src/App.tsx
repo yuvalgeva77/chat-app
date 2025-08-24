@@ -31,7 +31,7 @@ class ChatAPI {
   private baseUrl = 'http://localhost:8002'; // Updated to match your backend port
 
   /**
-   * Send a message to the chat API
+   * Send a message to the chat API (non-streaming)
    * @param message - The user's message
    * @param sessionId - Optional session ID for conversation continuity
    * @returns Promise with the bot's response and session ID
@@ -53,6 +53,66 @@ class ChatAPI {
     }
 
     return response.json();
+  }
+
+  /**
+   * Send a message with streaming response using Server-Sent Events
+   * @param message - The user's message
+   * @param sessionId - Optional session ID for conversation continuity
+   * @param onToken - Callback function called for each token received
+   * @param onComplete - Callback function called when streaming is complete
+   * @param onError - Callback function called on error
+   */
+  async sendMessageStream(
+    message: string,
+    sessionId: string | undefined,
+    onToken: (token: string, sessionId: string) => void,
+    onComplete: (sessionId: string) => void,
+    onError: (error: string) => void
+  ): Promise<void> {
+    const params = new URLSearchParams({
+      message,
+      ...(sessionId && { session_id: sessionId }),
+    });
+
+    const eventSource = new EventSource(`${this.baseUrl}/chat/stream?${params}`);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        if (data.done) {
+          eventSource.close();
+          onComplete(data.session_id);
+        } else if (data.token) {
+          onToken(data.token, data.session_id);
+        }
+      } catch (err) {
+        console.error('Error parsing SSE data:', err);
+        eventSource.close();
+        onError('Failed to parse streaming response');
+      }
+    };
+
+    eventSource.onerror = (event) => {
+      console.error('SSE error:', event);
+      eventSource.close();
+      onError('Connection error during streaming');
+    };
+
+    // Handle custom error events from backend
+    eventSource.addEventListener('error', (event) => {
+      try {
+        const data = JSON.parse((event as any).data);
+        if (data.error) {
+          eventSource.close();
+          onError(data.error);
+        }
+      } catch (err) {
+        eventSource.close();
+        onError('Unknown streaming error');
+      }
+    });
   }
 
   /**
@@ -175,11 +235,13 @@ const ChatInput: React.FC<{
   );
 };
 
-// Main Chat Application
+/**
+ * Main Chat Application Component
+ */
 const ChatApp: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessionId, setSessionId] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatAPI = new ChatAPI();
@@ -223,30 +285,59 @@ const ChatApp: React.FC = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setIsLoading(true);
+    setIsStreaming(true);
     setError('');
 
+    // Create placeholder bot message for streaming
+    const botMessageId = Date.now().toString() + '-bot';
+    const botMessage: Message = {
+      id: botMessageId,
+      text: '',
+      sender: 'bot',
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, botMessage]);
+
     try {
-      const response = await chatAPI.sendMessage(messageText, sessionId);
+      await chatAPI.sendMessageStream(
+        messageText,
+        sessionId,
+        // onToken: Update the bot message with new tokens
+        (token: string, newSessionId: string) => {
+          if (!sessionId) {
+            setSessionId(newSessionId);
+          }
 
-      // Update session ID if it's new
-      if (!sessionId) {
-        setSessionId(response.session_id);
-      }
-
-      const botMessage: Message = {
-        id: Date.now().toString() + '-bot',
-        text: response.reply,
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-
-      setMessages(prev => [...prev, botMessage]);
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === botMessageId
+                ? { ...msg, text: msg.text + token }
+                : msg
+            )
+          );
+        },
+        // onComplete: Streaming finished
+        (newSessionId: string) => {
+          if (!sessionId) {
+            setSessionId(newSessionId);
+          }
+          setIsStreaming(false);
+        },
+        // onError: Handle streaming errors
+        (errorMessage: string) => {
+          setError(`Streaming error: ${errorMessage}`);
+          setIsStreaming(false);
+          // Remove the placeholder bot message on error
+          setMessages(prev => prev.filter(msg => msg.id !== botMessageId));
+        }
+      );
     } catch (err) {
       setError('Failed to send message. Please try again.');
+      setIsStreaming(false);
+      // Remove the placeholder bot message on error
+      setMessages(prev => prev.filter(msg => msg.id !== botMessageId));
       console.error('Error sending message:', err);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -326,7 +417,7 @@ const ChatApp: React.FC = () => {
               {messages.map((message) => (
                 <ChatMessage key={message.id} message={message} />
               ))}
-              {isLoading && (
+              {isStreaming && (
                 <div className="flex justify-start mb-4">
                   <div className="max-w-xs lg:max-w-md px-4 py-2 rounded-lg bg-gray-200">
                     <LoadingSpinner />
@@ -339,7 +430,7 @@ const ChatApp: React.FC = () => {
         </div>
 
         {/* Input */}
-        <ChatInput onSendMessage={sendMessage} disabled={isLoading} />
+        <ChatInput onSendMessage={sendMessage} disabled={isStreaming} />
       </div>
     </div>
   );
