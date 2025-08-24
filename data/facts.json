@@ -1,0 +1,63 @@
+{
+  "basics": {
+    "name": "Youval Geva",
+    "title": "Backend / Full-Stack Software Engineer",
+    "location": "Amstelveen, Netherlands",
+    "work_authorization": "No visa required",
+    "languages": ["English (fluent)", "Hebrew (native)", "Dutch (A1)"],
+    "contact": {
+      "email": "yuvalgeva77@gmail.com",
+      "linkedin": "https://www.linkedin.com/in/yuvalgeva",
+      "github": "https://github.com/yuvalgeva77"
+    },
+    "availability": "Immediate"
+  },
+  "highlights": [
+    "4 years backend (Python, Java), REST APIs, microservices, CI/CD",
+    "Exposure to GCP/AWS",
+    "Recent full-stack work (React/Vue + FastAPI)"
+  ],
+  "experience": [
+    {
+      "title": "Full-Stack Developer",
+      "company": "Code Cube",
+      "period": "2025",
+      "type": "Short-Term Engagement",
+      "key_achievements": [
+        "Improved React portal design and functionality with Terraform and Docker deployment",
+        "Enhanced Cloud Run services on GCP for GTM/GA4 and DataLayer validation",
+        "Streamlined BigQuery pipelines and developed Playwright automation"
+      ]
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Checkpoint",
+      "period": "2021 - 2024",
+      "key_achievements": [
+        "Developed C++ nanoservices in agile environment with CI/CD automation",
+        "Built Go nanoservices with MongoDB/Kafka on AWS Kubernetes",
+        "Enhanced Java/Python automation testing infrastructure"
+      ]
+    },
+    {
+      "title": "QA Engineer",
+      "company": "Digital.ai (formerly Experitest)",
+      "period": "2020 - 2021",
+      "key_achievements": [
+        "Developed Android apps and automation tests in Java/Appium/JUnit",
+        "Contributed to CI/CD pipeline optimization with Jenkins/TeamCity"
+      ]
+    }
+  ],
+  "skills": {
+    "languages": ["Java", "Python", "C++", "Go"],
+    "cloud_data": ["Google Cloud Platform", "BigQuery SQL", "AWS", "MongoDB", "Kafka"],
+    "frameworks_tools": ["React", "Playwright", "Kibana", "Jenkins", "TeamCity", "Git", "Linux"],
+    "practices": ["CI/CD", "Agile", "Microservices", "Distributed Systems"]
+  },
+  "faq": {
+    "visa": "I do not require a visa in the Netherlands.",
+    "roles": "Backend or Full-Stack in Randstad.",
+    "work_setup": "Hybrid or remote."
+  }
+}
