@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Trash2, MessageCircle, Bot, User, Loader2 } from 'lucide-react';
+import { Send, Trash2, MessageCircle, Bot, User, Loader2, HelpCircle, X } from 'lucide-react';
 
 /**
  * Type definitions for the chat application
@@ -192,6 +192,109 @@ const ChatMessage: React.FC<{ message: Message }> = ({ message }) => {
 };
 
 /**
+ * Suggestions Sidebar Component
+ */
+const SuggestionsSidebar: React.FC<{
+  isOpen: boolean;
+  onToggle: () => void;
+  onSendMessage: (message: string) => void;
+  disabled: boolean;
+}> = ({ isOpen, onToggle, onSendMessage, disabled }) => {
+  const suggestions = [
+    'Summary',
+    'Experience',
+    'Projects',
+    'Availability',
+    'Work Authorization',
+    'Location',
+    'Contact',
+    'Skills',
+    'Education',
+    'Languages'
+  ];
+
+  return (
+    <>
+      {/* Overlay for mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-25 z-40 lg:hidden"
+          onClick={onToggle}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`fixed right-0 top-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 z-50 ${
+        isOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
+        <div className="flex flex-col h-full">
+          {/* Sidebar Header */}
+          <div className="bg-blue-500 text-white p-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <HelpCircle className="w-5 h-5" />
+              <h3 className="font-semibold">Quick Questions</h3>
+            </div>
+            <button
+              onClick={onToggle}
+              className="p-1 hover:bg-blue-600 rounded transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Suggestions List */}
+          <div className="flex-1 p-4 overflow-y-auto">
+            <p className="text-sm text-gray-600 mb-4">
+              Click any question below to ask about Youval's background:
+            </p>
+            <div className="space-y-2">
+              {suggestions.map((suggestion, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    onSendMessage(suggestion);
+                    onToggle(); // Close sidebar after selection
+                  }}
+                  disabled={disabled}
+                  className="w-full text-left p-3 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="font-medium text-gray-800">{suggestion}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Download CV Button */}
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <a
+                href="/Youval_Geva_Resume.pdf"
+                download="Youval_Geva_Resume.pdf"
+                className="w-full flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Download Full CV</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Toggle Button (floating) */}
+      {!isOpen && (
+        <button
+          onClick={onToggle}
+          className="fixed right-4 top-1/2 transform -translate-y-1/2 bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full shadow-lg transition-colors z-30"
+          title="Quick Questions"
+        >
+          <HelpCircle className="w-6 h-6" />
+        </button>
+      )}
+    </>
+  );
+};
+
+/**
  * Chat input component for sending messages
  * @param onSendMessage - Callback function when user sends a message
  * @param disabled - Whether the input should be disabled (e.g., during loading)
@@ -224,7 +327,7 @@ const ChatInput: React.FC<{
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Ask about experience, projects, availability..."
+          placeholder="Ask about Youval's experience, projects, availability..."
           disabled={disabled}
           className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
         />
@@ -249,6 +352,7 @@ const ChatApp: React.FC = () => {
   const [sessionId, setSessionId] = useState<string>('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string>('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatAPI = new ChatAPI();
 
@@ -366,8 +470,13 @@ const ChatApp: React.FC = () => {
     setError('');
   };
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
-    <div className="h-screen bg-gray-100 flex flex-col">
+    <div className="h-screen bg-gray-100 flex flex-col relative">
+      {/* Main Chat Container */}
       <div className="flex-1 bg-white shadow-lg flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white p-4">
@@ -410,6 +519,13 @@ const ChatApp: React.FC = () => {
                   <span>Clear</span>
                 </button>
               )}
+              <button
+                onClick={toggleSidebar}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm transition-colors flex items-center space-x-1.5 shadow-sm lg:hidden"
+              >
+                <HelpCircle className="w-4 h-4" />
+                <span>Questions</span>
+              </button>
             </div>
           </div>
         </div>
@@ -428,8 +544,8 @@ const ChatApp: React.FC = () => {
               <div className="text-center max-w-md w-full">
                 <Bot className="w-12 h-12 mx-auto mb-4 text-blue-500" />
                 <p className="text-lg mb-2 font-medium">Hi, I'm Youval's résumé assistant. What would you like to know?</p>
-                <p className="text-sm text-gray-600 mb-6">Click on any option below or type your question.</p>
-                
+                <p className="text-sm text-gray-600 mb-6">Click on any option below, use the suggestions panel, or type your question.</p>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto">
                   {['Summary', 'Experience', 'Projects', 'Availability', 'Work Authorization', 'Location', 'Contact'].map((option) => (
                     <button
@@ -473,6 +589,14 @@ const ChatApp: React.FC = () => {
         {/* Input */}
         <ChatInput onSendMessage={sendMessage} disabled={isStreaming} />
       </div>
+
+      {/* Suggestions Sidebar */}
+      <SuggestionsSidebar
+        isOpen={sidebarOpen}
+        onToggle={toggleSidebar}
+        onSendMessage={sendMessage}
+        disabled={isStreaming}
+      />
     </div>
   );
 };
