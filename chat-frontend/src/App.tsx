@@ -28,7 +28,7 @@ interface HistoryResponse {
  * API Service class for handling communication with the FastAPI backend
  */
 class ChatAPI {
-  private baseUrl = 'http://localhost:8002'; // Backend port
+  private baseUrl = 'http://localhost:8002'; // Updated to match your backend port
 
   /**
    * Send a message to the chat API
@@ -270,8 +270,8 @@ const ChatApp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="max-w-4xl mx-auto bg-white shadow-lg">
+    <div className="h-screen bg-gray-100 flex flex-col">
+      <div className="flex-1 bg-white shadow-lg flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4">
           <div className="flex items-center justify-between">
@@ -280,7 +280,7 @@ const ChatApp: React.FC = () => {
               <div>
                 <h1 className="text-xl font-bold">AI Chat Assistant</h1>
                 <p className="text-sm opacity-80">
-                  {sessionId ? `Session: ${sessionId.slice(0, 8)}...` : 'New Session'}
+                  {sessionId ? `Session: ${sessionId}` : 'New Session'}
                 </p>
               </div>
             </div>
@@ -312,7 +312,7 @@ const ChatApp: React.FC = () => {
         )}
 
         {/* Chat Messages */}
-        <div className="h-96 overflow-y-auto p-4 bg-gray-50">
+        <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
           {messages.length === 0 ? (
             <div className="flex items-center justify-center h-full text-gray-500">
               <div className="text-center">
