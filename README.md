@@ -194,9 +194,3 @@ The application can be configured using environment variables or by modifying th
 - `DATA_DIR`: Directory containing RAG data files (default: `/app/data` in Docker)
 - `INDEX_DIR`: Directory for storing vector indices (default: `/app/var/index` in Docker)
 - `MODEL_NAME`: HuggingFace model name (default: "Qwen/Qwen2.5-0.5B-Instruct")
-
-## License
-
-[Your License Here]
-
-*This interactive resume showcases not just the content of a traditional CV, but also demonstrates technical proficiency in modern web development, AI integration, and user experience design.*
