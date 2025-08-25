@@ -4,7 +4,7 @@
 A full-stack chat application featuring a React/TypeScript frontend and FastAPI backend with Retrieval-Augmented Generation (RAG) capabilities. The application allows for natural language conversations with AI, enhanced by local document retrieval.
 The chat's purpose is to provide a memorable experience for potential employers and collaborators.
 
-![Alt text](./images/Screenshot 2025-08-25 134138.png)
+![Chat Application Screenshot](images/Screenshot_25-08-25-134138.png)
 
 ## Technologies Used
 
@@ -66,7 +66,7 @@ The system employs a hybrid response strategy to handle different types of queri
 - The model is fine-tuned to maintain a professional yet approachable tone
 - Response length is limited to ensure concise, relevant answers
 
-![Alt text](./images/Screenshot_chat_2025-08-25 134825.png)
+![Chat Application Screenshot](images/Screenshot_chat_2025-08-25-134825.png)
 
 ## Data Flow
 
