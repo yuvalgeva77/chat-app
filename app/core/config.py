@@ -20,9 +20,11 @@ HISTORY_MAX_TURNS: int = 2
 HISTORY_TRIM_ON_EACH_REPLY: bool = True
 
 # ---------------- RAG (local data) ----------------
-# Using absolute paths for better reliability in Docker
-DATA_DIR: str = "/app/data"                     # expects: facts.json, cv.pdf, optional portfolio/*.md
-INDEX_DIR: str = "/app/var/index"               # embeddings cache
+# These paths work both locally and in Docker due to volume mounting
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+DATA_DIR: str = str(BASE_DIR / 'data')          # Points to /app/data in Docker, ./data locally
+INDEX_DIR: str = str(BASE_DIR / 'var' / 'index') # Points to /app/var/index in Docker, ./var/index locally
+
 EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
 TOP_K_DEFAULT: int = 3                       # tighter context = fewer glitches
 CHUNK_SIZE: int = 600

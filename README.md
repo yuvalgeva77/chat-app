@@ -2,6 +2,7 @@
 ### Chat Application with RAG
 
 A full-stack chat application featuring a React/TypeScript frontend and FastAPI backend with Retrieval-Augmented Generation (RAG) capabilities. The application allows for natural language conversations with AI, enhanced by local document retrieval.
+The chat's purpose is to Provide a memorable experience for potential employers and collaborators.
 
 ## Technologies Used
 
@@ -31,14 +32,6 @@ A full-stack chat application featuring a React/TypeScript frontend and FastAPI 
 - **Modern UI** - Clean, professional interface with loading states
 - **Error Handling** - Graceful error messages and recovery
 
-## Purpose
-
-This application was designed to:
-- Present a professional profile in an engaging, interactive format
-- Demonstrate technical expertise in full-stack development and AI integration
-- Showcase the ability to build production-ready AI applications
-- Provide a memorable experience for potential employers and collaborators
-
 ## Key Design Decisions
 
 ### 1. Response Generation Architecture
@@ -55,25 +48,7 @@ The system uses a two-layer response generation approach to ensure accuracy and 
    - The model is provided with relevant context from the resume and projects
    - Responses are grounded in the provided data to maintain accuracy
 
-### 2. Data Organization
-
-The application uses a structured approach to manage resume data:
-
-```
-data/
-├── facts.json          # Structured professional information
-│   ├── basics          # Contact information and summary
-│   ├── experience      # Work history and roles
-│   ├── education       # Academic background
-│   ├── skills          # Technical and professional skills
-│   └── projects        # Key projects and contributions
-├── cv.pdf              # Traditional PDF resume
-└── portfolio/          # Detailed project documentation
-    ├── project1.md
-    └── project2.md
-```
-
-### 3. Response Strategy
+### 2. Response Strategy
 
 The system employs a hybrid response strategy to handle different types of queries:
 
@@ -81,7 +56,7 @@ The system employs a hybrid response strategy to handle different types of queri
 - **RAG-Enhanced Responses**: For more complex queries, the system retrieves relevant document chunks and uses them to generate informed responses
 - **Fallback to LLM**: When no relevant information is found in the local data, the system can generate a response using the base LLM knowledge
 
-### 4. Model Selection
+### 3. Model Selection
 
 - **Qwen2.5-0.5B-Instruct** was chosen for its balance between performance and resource efficiency
 - The model is fine-tuned to maintain a professional yet approachable tone
@@ -184,7 +159,6 @@ npm run dev
 
 3. Start the development server:
    ```bash
-   cd app
    uvicorn main:app --reload --port 8002
    ```
 

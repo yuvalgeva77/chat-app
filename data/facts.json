@@ -4,7 +4,7 @@
     "title": "Backend / Full-Stack Software Engineer",
     "location": "Amstelveen, Netherlands",
     "work_authorization": "No visa required",
-    "languages": ["English (fluent)", "Hebrew (native)", "Dutch (A1)"],
+    "languages": ["English (fluent)", "Hebrew (native)"],
     "contact": {
       "email": "yuvalgeva77@gmail.com",
       "linkedin": "https://www.linkedin.com/in/yuvalgeva",
@@ -12,6 +12,13 @@
     },
     "availability": "Immediate"
   },
+  "education": [
+    {
+      "degree": "Bachelor of Science (B.Sc.) in Computer Science",
+      "institution": "Ben Gurion University",
+      "period": "2016 - 2020"
+    }
+  ],
   "highlights": [
     "4 years backend (Python, Java), REST APIs, microservices, CI/CD",
     "Exposure to GCP/AWS",
@@ -58,6 +65,8 @@
   "faq": {
     "visa": "I do not require a visa in the Netherlands.",
     "roles": "Backend or Full-Stack in Randstad.",
-    "work_setup": "Hybrid or remote."
+    "work_setup": "Hybrid or remote.",
+    "languages": "I am fluent in English and a native Hebrew speaker.",
+    "tech_stack": "My technical skills include:\n- Programming Languages: Java, Python, C++, Go\n- Cloud & Data: Google Cloud Platform, BigQuery SQL, AWS, MongoDB, Kafka\n- Frameworks & Tools: React, Playwright, Kibana, Jenkins, TeamCity, Git, Linux\n- Practices: CI/CD, Agile, Microservices, Distributed Systems"
   }
 }

@@ -9,6 +9,7 @@ services:
       - "8002:8000"
     volumes:
       - ./data:/app/data
+      - ./var:/app/var
       - ./models:/app/models
     environment:
       - PYTHONUNBUFFERED=1
@@ -29,4 +30,3 @@ services:
       - /app/node_modules
     depends_on:
       - backend
-    restart: unless-stopped
