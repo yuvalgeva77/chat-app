@@ -30,6 +30,87 @@ A full-stack chat application featuring a React/TypeScript frontend and FastAPI 
 - 🎨 **Modern UI** - Clean, professional interface with loading states
 - ❌ **Error Handling** - Graceful error messages and recovery
 
+## Purpose
+
+This application was designed to:
+- Present a professional profile in an engaging, interactive format
+- Demonstrate technical expertise in full-stack development and AI integration
+- Showcase the ability to build production-ready AI applications
+- Provide a memorable experience for potential employers and collaborators
+
+## Key Design Decisions
+
+### 1. Response Generation Architecture
+
+The system uses a two-layer response generation approach to ensure accuracy and relevance:
+
+1. **Structured Data Responses**
+   - For specific queries about skills, experience, or education, the system retrieves and formats information directly from structured data files
+   - Ensures factual accuracy for key professional information
+   - Maintains consistency in how experience and skills are presented
+
+2. **LLM-Powered Responses**
+   - For open-ended questions, the system uses a fine-tuned Qwen2.5-0.5B-Instruct model
+   - The model is provided with relevant context from the resume and projects
+   - Responses are grounded in the provided data to maintain accuracy
+
+### 2. Data Organization
+
+The application uses a structured approach to manage resume data:
+
+```
+data/
+├── facts.json          # Structured professional information
+│   ├── basics          # Contact information and summary
+│   ├── experience      # Work history and roles
+│   ├── education       # Academic background
+│   ├── skills          # Technical and professional skills
+│   └── projects        # Key projects and contributions
+├── cv.pdf              # Traditional PDF resume
+└── portfolio/          # Detailed project documentation
+    ├── project1.md
+    └── project2.md
+```
+
+### 3. Response Strategy
+
+The system employs a hybrid response strategy to handle different types of queries:
+
+- **Deterministic Responses**: For specific queries (e.g., "What's your experience with Python?"), the system retrieves and formats information directly from the structured data
+- **RAG-Enhanced Responses**: For more complex queries, the system retrieves relevant document chunks and uses them to generate informed responses
+- **Fallback to LLM**: When no relevant information is found in the local data, the system can generate a response using the base LLM knowledge
+
+### 4. Model Selection
+
+- **Qwen2.5-0.5B-Instruct** was chosen for its balance between performance and resource efficiency
+- The model is fine-tuned to maintain a professional yet approachable tone
+- Response length is limited to ensure concise, relevant answers
+
+## Data Flow
+
+1. User submits a query through the chat interface
+2. The backend processes the query to determine the intent
+3. For fact-based queries, the system retrieves information from the structured data
+4. For open-ended questions, the RAG system retrieves relevant document chunks
+5. The appropriate response template is selected based on the query type
+6. The response is formatted and returned to the user
+
+## Customization
+
+The application can be easily customized for different professional profiles by:
+
+1. Updating the files in the `data/` directory
+2. Modifying the response templates in the backend
+3. Adjusting the RAG parameters in `app/core/config.py`
+4. Updating the frontend styling to match personal branding
+
+## Future Enhancements
+
+- Integration with professional social media profiles
+- Interactive project demos and code samples
+- Multi-language support
+- Analytics dashboard to track common queries and user engagement
+
 ## Prerequisites
 
 - Docker and Docker Compose
@@ -117,3 +198,5 @@ The application can be configured using environment variables or by modifying th
 ## License
 
 [Your License Here]
+
+*This interactive resume showcases not just the content of a traditional CV, but also demonstrates technical proficiency in modern web development, AI integration, and user experience design.*
