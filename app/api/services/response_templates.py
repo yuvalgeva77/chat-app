@@ -162,6 +162,19 @@ def build_location_response() -> str:
     return f"Location: {loc or 'Not specified in my sources.'}"
 
 
+def build_languages_response() -> str:
+    """Language proficiencies from facts.json's basics.languages"""
+    b = _facts().get("basics", {}) or {}
+    languages = b.get("languages", [])
+    
+    if not languages:
+        return "I don't have information about language proficiencies in my records."
+        
+    response = "I am proficient in the following languages:\n"
+    response += "\n".join(f"- {lang}" for lang in languages)
+    return response
+
+
 # ===================== Smart Hybrid Responses =====================
 
 def build_smart_fallback(intent: str, user_message: str, retrieved_snippets: List[Tuple[str, str]]) -> str:
@@ -180,6 +193,8 @@ def build_smart_fallback(intent: str, user_message: str, retrieved_snippets: Lis
         base_response = build_skills_response()
     elif intent == "contact":
         base_response = build_contact_response()
+    elif intent == "languages":
+        base_response = build_languages_response()
     else:
         base_response = build_summary_response()
 
@@ -211,6 +226,7 @@ def get_template_response(intent: str) -> str:
         "availability": build_availability_response,
         "authorization": build_work_authorization_response,
         "location": build_location_response,
+        "languages": build_languages_response,
     }
 
     builder = template_map.get(intent)
@@ -234,18 +250,35 @@ PROJECTS_RE = re.compile(r"\b(projects?|portfolio|case stud(y|ies))\b", re.IGNOR
 SKILLS_RE = re.compile(r"\b(skills?|technologies|tech stack|programming languages?|tools?|frameworks?)\b",
                        re.IGNORECASE)
 EDUCATION_RE = re.compile(r"\b(education|degree|university|college|studied?)\b", re.IGNORECASE)
+LANGUAGES_RE = re.compile(
+    r'\b(languages?|speak|fluent|proficient|bilingual|multilingual|language skills?|what languages? do you speak|can you speak)'
+    r'\b', 
+    re.IGNORECASE
+)
 
 
 def detect_intent(text: str) -> str:
     """Enhanced intent detection for recruiter queries"""
-    s = text or ""
-    if CONTACT_RE.search(s): return "contact"
-    if SUMMARY_RE.search(s): return "summary"
-    if AVAIL_RE.search(s): return "availability"
-    if AUTH_RE.search(s): return "authorization"
-    if LOC_RE.search(s): return "location"
-    if SKILLS_RE.search(s): return "skills"
-    if PROJECTS_RE.search(s): return "projects"
-    if EXPERIENCE_RE.search(s): return "experience"
-    if EDUCATION_RE.search(s): return "education"
+    s = text.lower().strip()
+    
+    if CONTACT_RE.search(s):
+        return 'contact'
+    elif SUMMARY_RE.search(s):
+        return 'summary'
+    elif EXPERIENCE_RE.search(s):
+        return 'experience'
+    elif SKILLS_RE.search(s):
+        return 'skills'
+    elif PROJECTS_RE.search(s):
+        return 'projects'
+    elif AVAIL_RE.search(s):
+        return 'availability'
+    elif AUTH_RE.search(s):
+        return 'authorization'
+    elif LOC_RE.search(s):
+        return 'location'
+    elif LANGUAGES_RE.search(s):  
+        return 'languages'
+    elif EDUCATION_RE.search(s):
+        return 'education'
     return "other"

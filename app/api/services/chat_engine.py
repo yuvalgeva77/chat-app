@@ -368,7 +368,7 @@ def chat_once(
     if _use("hybrid"):
         # Use template responses for known intents
         if intent in ["contact", "summary", "experience", "skills", "projects",
-                      "availability", "authorization", "location"]:
+                      "availability", "authorization", "location", "languages", "education"]:
             import time
 
             # Add a small delay to simulate thinking (0.5-1.2 seconds)
@@ -439,7 +439,7 @@ def chat_stream(
     if _use("hybrid"):
         # Use template responses for known intents
         if intent in ["contact", "summary", "experience", "skills", "projects",
-                      "availability", "authorization", "location"]:
+                      "availability", "authorization", "location", "languages", "education"]:
             import time
 
             # Add a small delay to simulate thinking (0.5-1.5 seconds)
