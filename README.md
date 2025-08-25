@@ -31,6 +31,8 @@ The chat's purpose is to Provide a memorable experience for potential employers 
 - **Docker Support** - Easy containerized deployment
 - **Modern UI** - Clean, professional interface with loading states
 - **Error Handling** - Graceful error messages and recovery
+- **Quick Actions** - Clear chat and download resume with one click
+- **Smart Suggestions** - Helper button with common questions to get started
 
 ## Key Design Decisions
 
