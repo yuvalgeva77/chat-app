@@ -1,4 +1,5 @@
-# Chat Application with RAG
+# Youva's Resume Assistant
+### Chat Application with RAG
 
 A full-stack chat application featuring a React/TypeScript frontend and FastAPI backend with Retrieval-Augmented Generation (RAG) capabilities. The application allows for natural language conversations with AI, enhanced by local document retrieval.
 
@@ -20,15 +21,15 @@ A full-stack chat application featuring a React/TypeScript frontend and FastAPI 
 
 ## Features
 
-- 🚀 **Real-time Chat Interface** - Instant message display with auto-scroll
-- 🧠 **RAG Integration** - Enhanced responses using document retrieval
-- 💬 **Session Management** - Maintains conversation context across sessions
-- 📚 **Chat History** - Load and display previous conversations
-- 🗑️ **History Management** - Clear chat history or start new sessions
-- 📱 **Responsive Design** - Works seamlessly on desktop and mobile
-- 🐳 **Docker Support** - Easy containerized deployment
-- 🎨 **Modern UI** - Clean, professional interface with loading states
-- ❌ **Error Handling** - Graceful error messages and recovery
+- **Real-time Chat Interface** - Instant message display with auto-scroll
+- **RAG Integration** - Enhanced responses using document retrieval
+- **Session Management** - Maintains conversation context across sessions
+- **Chat History** - Load and display previous conversations
+- **History Management** - Clear chat history or start new sessions
+- **Responsive Design** - Works seamlessly on desktop and mobile
+- **Docker Support** - Easy containerized deployment
+- **Modern UI** - Clean, professional interface with loading states
+- **Error Handling** - Graceful error messages and recovery
 
 ## Purpose
 
@@ -95,6 +96,36 @@ The system employs a hybrid response strategy to handle different types of queri
 5. The appropriate response template is selected based on the query type
 6. The response is formatted and returned to the user
 
+## Chat History Management
+
+The application maintains conversation context using an in-memory history system, though the UI for viewing past conversations is planned for a future update. The current implementation includes:
+
+- **API Access**: Full history management is available through the backend API
+- **Context Window**: Keeps the last 2 conversation turns (configurable via `HISTORY_MAX_TURNS` in `config.py`)
+- **Session-based**: Each chat session is identified by a unique `session_id`
+- **Automatic Trimming**: History is automatically managed to maintain optimal context length
+
+### API Endpoints
+
+- `GET /history?session_id=<id>` - Retrieve chat history for a specific session
+- `POST /history/reset?session_id=<id>` - Reset history for a specific session (or all sessions if no ID provided)
+
+### Configuration
+
+- `HISTORY_MAX_TURNS`: Controls how many conversation turns to keep in context (default: 2)
+- `HISTORY_TRIM_ON_EACH_REPLY`: When `True`, trims history after each message (default: `True`)
+
+## Future Enhancements
+
+- Add UI for viewing and managing chat history
+- Implement persistent storage for chat history
+- Add search functionality for past conversations
+- Enable exporting chat history
+- Integration with professional social media profiles
+- Interactive project demos and code samples
+- Multi-language support
+- Analytics dashboard to track common queries and user engagement
+
 ## Customization
 
 The application can be easily customized for different professional profiles by:
@@ -103,13 +134,6 @@ The application can be easily customized for different professional profiles by:
 2. Modifying the response templates in the backend
 3. Adjusting the RAG parameters in `app/core/config.py`
 4. Updating the frontend styling to match personal branding
-
-## Future Enhancements
-
-- Integration with professional social media profiles
-- Interactive project demos and code samples
-- Multi-language support
-- Analytics dashboard to track common queries and user engagement
 
 ## Prerequisites
 
