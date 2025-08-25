@@ -161,7 +161,7 @@ npm run dev
 
 3. Start the development server:
    ```bash
-   uvicorn main:app --reload --port 8002
+   uvicorn app.main:app --reload --port 8002
    ```
 
 ## Project Structure

@@ -175,6 +175,32 @@ def build_languages_response() -> str:
     return response
 
 
+def build_education_response() -> str:
+    """Education information from facts.json"""
+    f = _facts()
+    education = f.get("education", []) or []
+    if not education:
+        return "Education details are not specified in my sources."
+
+    lines = ["Education:\n"]
+    for edu in education:
+        degree = edu.get('degree', 'Degree not specified')
+        institution = edu.get('institution', 'Institution not specified')
+        period = edu.get('period', 'Period not specified')
+        
+        lines.append(f"{degree}")
+        lines.append(f"{institution} ({period})")
+        
+        # Add any additional fields if they exist
+        for key, value in edu.items():
+            if key not in ['degree', 'institution', 'period']:
+                lines.append(f"{key.title()}: {value}")
+                
+        lines.append("")  # Add spacing between entries
+
+    return "\n".join(lines).strip()
+
+
 # ===================== Smart Hybrid Responses =====================
 
 def build_smart_fallback(intent: str, user_message: str, retrieved_snippets: List[Tuple[str, str]]) -> str:
@@ -195,6 +221,8 @@ def build_smart_fallback(intent: str, user_message: str, retrieved_snippets: Lis
         base_response = build_contact_response()
     elif intent == "languages":
         base_response = build_languages_response()
+    elif intent == "education":
+        base_response = build_education_response()
     else:
         base_response = build_summary_response()
 
@@ -221,6 +249,7 @@ def get_template_response(intent: str) -> str:
         "contact": build_contact_response,
         "summary": build_summary_response,
         "experience": build_experience_response,
+        "education": build_education_response,
         "skills": build_skills_response,
         "projects": build_projects_response,
         "availability": build_availability_response,
@@ -249,7 +278,10 @@ EXPERIENCE_RE = re.compile(r"\b(experience|background|roles?)\b", re.IGNORECASE)
 PROJECTS_RE = re.compile(r"\b(projects?|portfolio|case stud(y|ies))\b", re.IGNORECASE)
 SKILLS_RE = re.compile(r"\b(skills?|technologies|tech stack|programming languages?|tools?|frameworks?)\b",
                        re.IGNORECASE)
-EDUCATION_RE = re.compile(r"\b(education|degree|university|college|studied?)\b", re.IGNORECASE)
+EDUCATION_RE = re.compile(
+    r"(education|degree|university|college|school|stud(y|ied)|graduat(e|ion)|academic|qualification)", 
+    re.IGNORECASE
+)
 LANGUAGES_RE = re.compile(
     r'\b(languages?|speak|fluent|proficient|bilingual|multilingual|language skills?|what languages? do you speak|can you speak)'
     r'\b', 
