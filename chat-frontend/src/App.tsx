@@ -543,7 +543,7 @@ const ChatApp: React.FC = () => {
             <div className="flex items-center justify-center h-full text-gray-500">
               <div className="text-center max-w-md w-full">
                 <Bot className="w-12 h-12 mx-auto mb-4 text-blue-500" />
-                <p className="text-lg mb-2 font-medium">Hi, I'm Youval's résumé assistant. What would you like to know?</p>
+                <p className="text-lg mb-2 font-medium">Hi, I'm Youval's resume assistant. What would you like to know?</p>
                 <p className="text-sm text-gray-600 mb-6">Click on any option below, use the suggestions panel, or type your question.</p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto">
