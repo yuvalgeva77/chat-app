@@ -149,7 +149,7 @@ npm run dev
 1. Create and activate a virtual environment:
    ```bash
    python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   .venv\Scripts\activate  # On Windows: 
    ```
 
 2. Install dependencies:
