@@ -1,8 +1,10 @@
-# Youva's Resume Assistant
+# Youva'ls Resume Assistant
 ### Chat Application with RAG
 
 A full-stack chat application featuring a React/TypeScript frontend and FastAPI backend with Retrieval-Augmented Generation (RAG) capabilities. The application allows for natural language conversations with AI, enhanced by local document retrieval.
-The chat's purpose is to Provide a memorable experience for potential employers and collaborators.
+The chat's purpose is to provide a memorable experience for potential employers and collaborators.
+
+![Alt text](./images/Screenshot 2025-08-25 134138.png)
 
 ## Technologies Used
 
@@ -64,6 +66,8 @@ The system employs a hybrid response strategy to handle different types of queri
 - The model is fine-tuned to maintain a professional yet approachable tone
 - Response length is limited to ensure concise, relevant answers
 
+![Alt text](./images/Screenshot_chat_2025-08-25 134825.png)
+
 ## Data Flow
 
 1. User submits a query through the chat interface
@@ -120,18 +124,28 @@ The application can be easily customized for different professional profiles by:
 
 ## Quick Start with Docker
 
-1. **Clone the repository:**
+1. **Ensure Docker Desktop is running:**
+   - Open Docker Desktop from your Start Menu
+   - Wait for it to fully start (you'll see the Docker whale icon in your system tray)
+   - Verify Docker is running by opening a terminal and running:
+     ```bash
+     docker --version
+     docker-compose --version
+     ```
+   You should see version numbers for both commands if Docker is running correctly.
+
+2. **Clone the repository:**
    ```bash
    git clone <your-repo-url>
    cd chat-app
    ```
 
-2. **Build and start the application:**
+3. **Build and start the application:**
    ```bash
    docker-compose up --build
    ```
 
-3. **Access the application:**
+4. **Access the application:**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:8002
    - API Documentation: http://localhost:8002/docs
