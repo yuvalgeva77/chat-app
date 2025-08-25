@@ -1,90 +1,119 @@
-# Chat App
-A modern, responsive chat application built with React, TypeScript, and Tailwind CSS. This frontend connects to a FastAPI backend to provide real-time conversations with AI models.
+# Chat Application with RAG
+
+A full-stack chat application featuring a React/TypeScript frontend and FastAPI backend with Retrieval-Augmented Generation (RAG) capabilities. The application allows for natural language conversations with AI, enhanced by local document retrieval.
 
 ## Technologies Used
+
+### Frontend
 - **React 18** - Frontend framework
 - **TypeScript** - Type safety and better development experience
 - **Vite** - Fast development and build tool
 - **Tailwind CSS** - Utility-first CSS framework
 - **Lucide React** - Beautiful icons
-- **Python FastAPI** - HTTP client for backend communication
+
+### Backend
+- **Python FastAPI** - High-performance web framework
+- **PyTorch** - Deep learning framework
+- **HuggingFace Transformers** - For natural language processing
+- **Sentence-Transformers** - For text embeddings
+- **Uvicorn** - ASGI server
 
 ## Features
+
 - 🚀 **Real-time Chat Interface** - Instant message display with auto-scroll
+- 🧠 **RAG Integration** - Enhanced responses using document retrieval
 - 💬 **Session Management** - Maintains conversation context across sessions
 - 📚 **Chat History** - Load and display previous conversations
 - 🗑️ **History Management** - Clear chat history or start new sessions
 - 📱 **Responsive Design** - Works seamlessly on desktop and mobile
-- ⌨️ **Keyboard Shortcuts** - Press Enter to send messages
+- 🐳 **Docker Support** - Easy containerized deployment
 - 🎨 **Modern UI** - Clean, professional interface with loading states
 - ❌ **Error Handling** - Graceful error messages and recovery
 
 ## Prerequisites
-- Node.js (v18 or higher)
-- npm or yarn
-- Running FastAPI backend on `http://localhost:8002`
-- Make sure your FastAPI backend has CORS enabled
 
-## Installation
+- Docker and Docker Compose
+- Node.js (v18 or higher) for frontend development
+- Python 3.11+ for backend development
+
+## Quick Start with Docker
+
 1. **Clone the repository:**
    ```bash
    git clone <your-repo-url>
-   cd chat-frontend
+   cd chat-app
    ```
 
-2. **Install dependencies:**
+2. **Build and start the application:**
    ```bash
-   npm install
+   docker-compose up --build
    ```
 
-3. **Start the development server:**
+3. **Access the application:**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8002
+   - API Documentation: http://localhost:8002/docs
+
+## Development Setup
+
+### Frontend Development
+
+```bash
+cd chat-frontend
+npm install
+npm run dev
+```
+
+### Backend Development
+
+1. Create and activate a virtual environment:
    ```bash
-   npm run dev
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
    ```
 
-4. **Open your browser:**
-   Navigate to `http://localhost:3000`
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## Backend Integration
-
-This frontend is designed to work with a FastAPI backend that provides these endpoints:
-
-- `POST /chat` - Send messages to the AI
-- `GET /history?session_id=<id>` - Retrieve conversation history
-- `POST /history/reset?session_id=<id>` - Clear chat history
+3. Start the development server:
+   ```bash
+   cd app
+   uvicorn main:app --reload --port 8002
+   ```
 
 ## Project Structure
 
 ```
-src/
-├── App.tsx              # Main chat application component
-├── main.tsx            # React application entry point
-├── index.css           # Global styles with Tailwind CSS
-└── vite-env.d.ts       # Vite type definitions
+chat-app/
+├── app/                    # Backend FastAPI application
+│   ├── api/                # API routes
+│   ├── core/               # Core functionality
+│   ├── models/             # ML models and embeddings
+│   └── main.py             # FastAPI application entry point
+├── chat-frontend/          # React frontend
+│   ├── public/             # Static files
+│   └── src/                # Source code
+├── data/                   # Data files for RAG
+│   ├── facts.json          # Structured facts data
+│   └── cv.pdf              # CV document (optional)
+├── docker/                 # Docker configuration
+├── .env                    # Environment variables
+├── docker-compose.yml      # Docker Compose configuration
+├── Dockerfile.backend      # Backend Dockerfile
+├── Dockerfile.frontend     # Frontend Dockerfile
+└── requirements.txt        # Python dependencies
 ```
 
-## Key Components
+## Configuration
 
-### ChatAPI Class
-Handles all communication with the FastAPI backend:
-- Message sending with session management
-- History retrieval and management
-- Error handling with proper HTTP status codes
+The application can be configured using environment variables or by modifying the configuration files:
 
-### ChatMessage Component
-Renders individual chat messages with:
-- User/bot differentiation
-- Timestamps
-- Responsive design
+- `DATA_DIR`: Directory containing RAG data files (default: `/app/data` in Docker)
+- `INDEX_DIR`: Directory for storing vector indices (default: `/app/var/index` in Docker)
+- `MODEL_NAME`: HuggingFace model name (default: "Qwen/Qwen2.5-0.5B-Instruct")
 
-### ChatInput Component
-Message input interface with:
-- Enter key submission
-- Input validation
-- Loading state handling
+## License
 
-### Styling
-The application uses Tailwind CSS for styling.
-
-## Logging
-- console logging (timestamp, level, file, line).
+[Your License Here]

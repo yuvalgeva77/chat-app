@@ -20,10 +20,9 @@ HISTORY_MAX_TURNS: int = 2
 HISTORY_TRIM_ON_EACH_REPLY: bool = True
 
 # ---------------- RAG (local data) ----------------
-# NOTE: These are relative to your process working directory.
-# Keep your files under project-root /data and /var/index (or adjust as you like).
-DATA_DIR: str = "data"                       # expects: facts.json, cv.pdf, optional portfolio/*.md
-INDEX_DIR: str = "var/index"                 # embeddings cache
+# Using absolute paths for better reliability in Docker
+DATA_DIR: str = "/app/data"                     # expects: facts.json, cv.pdf, optional portfolio/*.md
+INDEX_DIR: str = "/app/var/index"               # embeddings cache
 EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
 TOP_K_DEFAULT: int = 3                       # tighter context = fewer glitches
 CHUNK_SIZE: int = 600
